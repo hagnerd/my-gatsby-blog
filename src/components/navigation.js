@@ -7,7 +7,7 @@ const Title = styled.h1`
 `;
 
 const linkStyles = css`
-  color: #653D67;
+  color: black;
   transition: all 100ms ease-in-out;
   &:hover {
     color: #D65A41;

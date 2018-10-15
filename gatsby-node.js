@@ -1,6 +1,10 @@
 const path = require("path");
 const { createFilePath } = require("gatsby-source-filesystem");
 
+// const kebabCase = str => str.includes(" ") ? str.split(" ").join("-") : str;
+//
+// const unique = arr => [... new Set(arr)];
+
 exports.onCreateNode = ({ node, getNode, actions }) => {
 
   const { createNodeField } = actions;
