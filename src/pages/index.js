@@ -20,12 +20,12 @@ const BlogInfo = styled.h4`
   margin: 10px 0;
 `
 
-const BlogExcerpt = ({ title, date, excerpt, slug }) => (
+const BlogExcerpt = ({ title, date, excerpt, path }) => (
   <Card>
-    <BlogTitle><Link to={slug}>{title}</Link></BlogTitle>
+    <BlogTitle><Link to={path}>{title}</Link></BlogTitle>
     <BlogInfo>{date}</BlogInfo>
     <p>{excerpt}</p>
-    <Link to={slug}>Read more -></Link>
+    <Link to={path}>Read more -></Link>
   </Card>
 )
 
@@ -43,7 +43,7 @@ export default ({ data }) => (
             title={node.frontmatter.title}
             date={node.frontmatter.date}
             excerpt={node.excerpt}
-            slug={node.fields.slug}
+            path={node.frontmatter.path}
           />
         ))}
       </div>
@@ -65,9 +65,7 @@ query {
         frontmatter {
           title
           date(formatString: "MMMM DD, YYYY")
-        }
-        fields {
-          slug
+          path
         }
       }
     }

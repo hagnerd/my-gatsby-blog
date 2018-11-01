@@ -1,6 +1,8 @@
 ---
 title: "Learning D3 from the ground up"
 data: "2018-10-15"
+tags: ["javascript", "data visualization", "learn in public"]
+path: "/blog/d3-part-1"
 ---
 
 Some backstory...

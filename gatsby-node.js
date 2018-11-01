@@ -1,36 +1,25 @@
 const path = require("path");
 const { createFilePath } = require("gatsby-source-filesystem");
 
-// const kebabCase = str => str.includes(" ") ? str.split(" ").join("-") : str;
-//
-// const unique = arr => [... new Set(arr)];
-
-exports.onCreateNode = ({ node, getNode, actions }) => {
-
-  const { createNodeField } = actions;
-
-  if (node.internal.type === "MarkdownRemark") {
-    const slug = createFilePath({ node, getNode, basePath: "blog" });
-
-    createNodeField({
-      node,
-      name: "slug",
-      value: slug
-    });
-
-  }
-}
+const kebabCase = str => str.includes(" ") ? str.split(" ").join("-") : str;
+const unique = arr => [... new Set(arr)];
 
 exports.createPages = ({ graphql, actions }) => {
   const { createPage } = actions;
-  return new Promise((resolve, reject) => {
-    graphql(`
+
+  return graphql(`
     {
-      allMarkdownRemark {
+      allMarkdownRemark(
+        sort: {
+          fields: [frontmatter___date]
+          order: DESC
+        } 
+      ) {
         edges {
           node {
-            fields {
-              slug
+            frontmatter {
+              path
+              tags
             }
           }
         }
@@ -38,19 +27,44 @@ exports.createPages = ({ graphql, actions }) => {
     }
 
     `).then(result => {
-      result.data.allMarkdownRemark.edges.forEach(({ node }) => {
+      if (result.errors) {
+        return Promise.reject(result.errors);
+      }
+
+      let posts = result.data.allMarkdownRemark.edges;
+
+      posts.forEach(({ node }) => {
         createPage({
-          path: node.fields.slug,
-          component: path.resolve(`./src/templates/blog-post.js`),
+          path: node.frontmatter.path,
+          component: path.resolve(`src/templates/blog-post.js`),
           context: {
             // data passed to context is available 
             // in queries as GraphQL variables
-            slug: node.fields.slug,
           }
-        })
-        resolve();
-      })
+        });
+      });
+
+      let tags = []; 
+
+      posts.forEach(post => {
+        if (post.node.frontmatter.tags) {
+          tags = tags.concat(post.node.frontmatter.tags);
+        }
+      });
+
+      // get unique tags
+      tags = unique(tags.map(tag => kebabCase(tag).toLowerCase()));
+
+      tags.forEach(tag => {
+        createPage({
+          path: `/tags/${tag}/`,
+          component: path.resolve('src/templates/tag.js'),
+          context: {
+            tag,
+          }
+        });
+      });
+
     });
-  });
 
 }
